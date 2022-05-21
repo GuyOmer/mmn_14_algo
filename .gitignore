@@ -1,0 +1,4 @@
+cmake-build-debug/*
+*.docx
+*.xlsx
+.idea/*
