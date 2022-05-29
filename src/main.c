@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #include "retvals.h"
 #include "common.h"
@@ -35,15 +36,14 @@ initialize_array(size_t amount_of_values, int **arr) {
     }
 
     internal_arr = (int *)malloc(sizeof(*arr) * amount_of_values);
-    if (arr == NULL) {
+    if (NULL == internal_arr) {
         retval = MAIN__FAILED_ALLOCATION_ARRAY;
         goto l_cleanup;
     }
 
     // keep asking for input until an appropriate input
     while (1) {
-//        should_randomize_input_user_input = get_char("Should randomize characters (y\\n): ");
-        should_randomize_input_user_input = 'y';
+        should_randomize_input_user_input = get_char("Should randomize characters (y\\n): ");
         if (should_randomize_input_user_input == 'y') {
             should_randomize_arr = true;
             break;
@@ -55,6 +55,7 @@ initialize_array(size_t amount_of_values, int **arr) {
     }
 
     if (should_randomize_arr) {
+        srand(time(NULL));
         for (size_t i = 0; i < amount_of_values; ++i) {
             internal_arr[i] = rand() % (RANGE_MAX + 1); // [RANGE_MIN ... RANGE_MAX]
         }
@@ -71,7 +72,6 @@ initialize_array(size_t amount_of_values, int **arr) {
         }
     }
 
-
     // transfer of ownership
     *arr = internal_arr;
     internal_arr = NULL;
@@ -79,9 +79,7 @@ initialize_array(size_t amount_of_values, int **arr) {
     retval = SUCCESS;
 
 l_cleanup:
-    if (internal_arr != NULL) {
-        free(internal_arr);
-    }
+    SAFE_FREE(internal_arr);
 
     return  retval;
 }
@@ -96,33 +94,17 @@ l_cleanup:
  * @return: SUCCESS if successful, otherwise an appropriate status code
  */
 static
-retval_t
+void
 run_quick(size_t k, size_t length, int *arr) {
-    retval_t retval = UNINITIALIZED;
     int k_smallest_value = 0;
     size_t k_smallest_value_index = 0;
-    size_t i = 0;
 
-    k_smallest_value = QUICK__randomized_select(arr, 0, length, k);
+    k_smallest_value = QUICK__randomized_select(arr, 0, length-1, k);
 
-    // find the index of th k smallest item
+    // find the index of the k smallest item
     for(; arr[k_smallest_value_index] != k_smallest_value; ++k_smallest_value_index);
 
-    retval = QUICK__quicktsort(arr, 0, k_smallest_value_index);
-    if(SUCCESS != retval) {
-        goto l_cleanup;
-    }
-
-    // print results
-    (void)printf("Quick (%zu): ", g_quick_cmp_count);
-    for(i = 0; i < k; ++i) {
-        (void)printf("%d ", arr[i]);
-    }
-    (void)printf("\n");
-
-    retval = SUCCESS;
-l_cleanup:
-    return retval;
+    QUICK__quicksort(arr, 0, k_smallest_value_index);
 }
 
 /**
@@ -140,10 +122,8 @@ run_heap(size_t values_to_extract, size_t length, int *arr) {
 
     HEAP__build_min_heap(arr, (length));
 
-    (void)printf("Heap (%zu): ", g_heap_cmp_count);
     for (size_t i = 0; i < values_to_extract; ++i) {
         HEAP__extract_min(arr, &length, &min);
-        printf("%d ", min);
     }
 
     (void)printf("\n");
@@ -189,6 +169,8 @@ int main(int argc, char *argv[]) {
 
     run_heap(values_to_extract, amount_of_values, arr);
     run_quick(values_to_extract, amount_of_values, quick_arr);
+
+    (void)printf("%d %d %zu %zu\n", amount_of_values, values_to_extract, g_heap_cmp_count, g_quick_cmp_count);
 
     retval = SUCCESS;
 

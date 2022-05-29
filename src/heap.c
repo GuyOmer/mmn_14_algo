@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stddef.h>
 #include <assert.h>
 
@@ -26,7 +25,7 @@ heapify(int heap[], size_t heap_size, int root_index) {
     if (left < heap_size && heap[left] < heap[smallest])
         smallest = left;
 
-    // if right child is less than smallest so far
+    // if right child is less than smallest
     if (right < heap_size && heap[right] < heap[smallest])
         smallest = right;
 
@@ -39,15 +38,10 @@ heapify(int heap[], size_t heap_size, int root_index) {
     }
 
     // count comparisons
-    g_heap_cmp_count += 3;
+    g_heap_cmp_count += 2;
 }
 
-/**
- * Builds a heap according to the build-min-heap algorithm.
- * @param heap: heap array we will be building.
- * @param heap_size : number of elements in the heap
- * @return: SUCCESS if successful, otherwise an appropriate status code
- */
+
 retval_t
 HEAP__build_min_heap(int heap[], size_t heap_size) {
     retval_t retval = UNINITIALIZED;
@@ -68,13 +62,7 @@ l_cleanup:
     return retval;
 }
 
-/**
- * Extracts the samllest number from the heap, and re-heapifies the heap
- * @param heap: heap we will be extracting from.
- * @param heap_size : number of elements in the heap
- * @param min: store minimum value of the heap here
- * @return: SUCCESS if successful, otherwise an appropriate status code
- */
+
 retval_t
 HEAP__extract_min(int heap[], size_t *heap_size, int *min) {
     retval_t retval = UNINITIALIZED;
@@ -86,6 +74,7 @@ HEAP__extract_min(int heap[], size_t *heap_size, int *min) {
         goto l_cleanup;
     }
 
+    // extract minimum value
     internal_min = heap[0];
     heap[0] = heap[internal_heap_size - 1];
     --internal_heap_size;

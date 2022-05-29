@@ -22,5 +22,5 @@ QUICK__randomized_select(int arr[], size_t start, size_t end, size_t k);
  * @param end : end index
 * @return: SUCCESS if successful, otherwise an appropriate status code
  */
-retval_t
-QUICK__quicktsort(int arr[], size_t start, size_t end);
+void
+QUICK__quicksort(int arr[], size_t start, size_t end);
